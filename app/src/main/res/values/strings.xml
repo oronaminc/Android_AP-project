@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">커뮤니터</string>
+    <string name="title_bar_name">연결하려는 AP 설정</string>
+    <string name="title_bar_check">확인하기</string>
+    <string name="title_bar_cancel">취소하기</string>
+
+
+</resources>

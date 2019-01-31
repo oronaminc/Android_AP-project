@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <group>
+        <item
+            android:id="@+id/menu_setting"
+            android:title="ip/port (재)설정"
+            android:icon="@drawable/three_circle"
+            />
+        <item
+            android:id="@+id/menu_log"
+            android:title="ip/port 상태"
+            android:icon="@drawable/three_circle"
+            />
+    </group>
+</menu>

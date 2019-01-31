@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#ecf0f1"
+    android:orientation="vertical"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:padding="30dp">
+
+    <!-- 타이틀바 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:orientation="horizontal"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|center_horizontal|center_vertical"
+            android:gravity="center|center_horizontal|center_vertical"
+            android:padding="10dp"
+            android:singleLine="true"
+            android:text="연결하려는 AP 설정"
+            android:textColor="#2d3436"
+            android:textSize="25sp" />
+
+    </LinearLayout>
+
+    <!-- //end 타이틀바 -->
+
+    <!-- IP 설정 -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center|center_horizontal|center_vertical"
+        android:paddingRight="30dp"
+        android:paddingLeft="30dp"
+        android:paddingBottom="5dp"
+        >
+        <TextView
+            android:id="@+id/txtText"
+            android:textSize="15sp"
+            android:textColor="#2d3436"
+            android:gravity="center"
+            android:text="IP"
+            android:layout_width="0dp"
+            android:layout_weight="1.5"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/View1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            app:srcCompat="@android:color/transparent" />
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:inputType="text"
+            android:singleLine="true"
+            android:id="@+id/input_ip"
+            android:hint="192.168.155.155"/>
+    </LinearLayout>
+
+    <!-- Port 설정 -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center|center_horizontal|center_vertical"
+        android:paddingRight="30dp"
+        android:paddingLeft="30dp"
+        android:paddingBottom="5dp"
+        >
+
+        <TextView
+            android:id="@+id/txtText1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:gravity="center"
+            android:text="PORT"
+            android:textColor="#2d3436"
+            android:textSize="15sp" />
+        <ImageView
+            android:id="@+id/View2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            app:srcCompat="@android:color/transparent" />
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:inputType="text"
+            android:singleLine="true"
+            android:id="@+id/input_port"
+            android:hint="4000"/>
+    </LinearLayout>
+
+    <!-- User 설정 -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center|center_horizontal|center_vertical"
+        android:paddingRight="30dp"
+        android:paddingLeft="30dp"
+        android:paddingBottom="5dp"
+        >
+
+        <TextView
+            android:id="@+id/txtText2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:gravity="center"
+            android:text="USER"
+            android:textColor="#2d3436"
+            android:textSize="15sp" />
+        <ImageView
+            android:id="@+id/View3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            app:srcCompat="@android:color/transparent" />
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:inputType="text"
+            android:singleLine="true"
+            android:id="@+id/input_user"
+            android:hint="infra"/>
+    </LinearLayout>
+
+    <!-- Notice -->
+
+    <View
+        android:background="#662d3436"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+
+    <!-- 닫기 버튼 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:autoSizeTextType="uniform"
+            android:background="@drawable/button_round"
+            android:gravity="center"
+            android:onClick="send_popup_click"
+            android:id="@+id/send_popup"
+            android:padding="12dp"
+            android:text="설정하기"
+            android:textColor="#dfe6e9"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/View"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.1"
+            app:srcCompat="@android:color/transparent" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:autoSizeTextType="uniform"
+            android:background="@drawable/button_round"
+            android:gravity="center"
+            android:onClick="mOnClose"
+            android:padding="12dp"
+            android:text="취소하기"
+            android:textColor="#dfe6e9"
+            android:textStyle="bold" />
+
+
+
+    </LinearLayout>
+
+</LinearLayout>
