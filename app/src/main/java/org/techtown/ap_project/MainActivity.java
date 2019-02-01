@@ -82,8 +82,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 메인 화면 잘 넘어가는 지 확인
-    public void gotoMain(View v){
-        Intent intent = new Intent(this, MainScreen.class);
+    public void gotoMemoPicture(View v){
+        Intent intent = new Intent(this, UploadMemoPicture.class);
         startActivity(intent);
     }
 

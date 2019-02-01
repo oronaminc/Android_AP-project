@@ -52,9 +52,9 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:background="@drawable/button_round_dark"
-            android:onClick="gotoMain"
+            android:onClick="gotoMemoPicture"
             android:padding="15dp"
-            android:text="메인 화면"
+            android:text="사진 및 메모"
             android:textColor="#FFFFFF"
             android:textSize="40sp" />
 
