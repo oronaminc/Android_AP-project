@@ -136,6 +136,11 @@ public class WorkList extends AppCompatActivity {
                 String port = data.getStringExtra("port");
                 String user = data.getStringExtra("user");
 
+                //global 변수로 데이터 넘겨주기
+                glob_ip=ip;
+                glob_port=port;
+                glob_user=user;
+
                 Toast.makeText(getApplicationContext(),  "IP : "+glob_ip+"\n"+"PORT : "+glob_port+"\n"+"USER : "+glob_user, Toast.LENGTH_LONG).show();
 
                 //ip가 연결 되었을 때 툴바 제목 바꾸어주기
@@ -144,6 +149,18 @@ public class WorkList extends AppCompatActivity {
                 getSupportActionBar().setTitle(ip+" Connected");
             }
         }
+    }
+
+    // 뒤로가기 누르면 ip, port, user 이름 그대로 전달
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("glob_ip", glob_ip);
+        intent.putExtra("glob_port", glob_port);
+        intent.putExtra("glob_user", glob_user);
+        startActivity(intent);
+
     }
 
     // 어댑터 설정하는 부분

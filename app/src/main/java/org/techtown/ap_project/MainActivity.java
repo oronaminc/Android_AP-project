@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+
 public class MainActivity extends AppCompatActivity {
 
     //Global 변수 선언
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Toolbar 선언
     Toolbar toolbar;
+
 
     /* 점검용으로 쓰임
     TextView popup_result_ip;
@@ -32,21 +34,39 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 로딩화면 띄우기
-        Intent intent = new Intent(this, MainScreen.class);
-        startActivity(intent);
+
+
+        if(getIntent().getExtras() == null){
+            // 로딩화면 띄우기
+            Intent intent2 = new Intent(this, MainScreen.class);
+            startActivity(intent2);
+        }else{
+            Intent intent = getIntent();
+            glob_ip = intent.getExtras().getString("glob_ip");
+            glob_port = intent.getExtras().getString("glob_port");
+            glob_user = intent.getExtras().getString("glob_user");
+        }
 
         // 툴바 사용 설정 및 제목 지정
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("AP Disconnected");
+        if (glob_ip != null){
+            getSupportActionBar().setTitle(glob_ip+" Connected");
+        }else{
+            getSupportActionBar().setTitle("AP Disconnected");
+        }
 
         /*점검용으로 쓰임
         popup_result_ip = (TextView)findViewById(R.id.popup_result_ip);
         popup_result_port = (TextView)findViewById(R.id.popup_result_port);
         popup_result_user = (TextView)findViewById(R.id.popup_result_user);
         */
+    }
 
+    // ip, port, user 를 공용으로 쓰게 하는 부분
+    @Override
+    protected void onStart(){
+        super.onStart();
 
 
     }
