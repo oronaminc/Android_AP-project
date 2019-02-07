@@ -63,21 +63,22 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:layout_weight="1">
+
         <Button
+            android:id="@+id/btnWrite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
             android:padding="17dp"
-            android:id="@+id/btnWrite"
-            android:text="내장 메모리에 파일 쓰기 "/>
+            android:text="메모 및 사진 저장하기" />
 
         <Button
+            android:id="@+id/btnRead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:padding="17dp"
-            android:id="@+id/btnRead"
-            android:text="내장 메모리에 파일 읽기 "/>
+            android:text="메모 및 사진 업로드하기" />
 
     </LinearLayout>
 
