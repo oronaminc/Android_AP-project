@@ -3,6 +3,7 @@
     package="org.techtown.ap_project">
     <!-- 카메라 기능을 사용할 수 있도록 permision을 줍니다 -->
     <uses-permission android:name="android.permisson.CAMERA" />
+    <uses-feature android:name="android.hardware.camera2" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -15,6 +16,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:noHistory="true">
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.test.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <activity android:name=".UploadMemoPicture"></activity>
         <activity android:name=".CameraActivity" />
         <activity android:name=".WorkList" /> <!-- 팝업 Activity, 팝업 스타일이라고 명시해줍니다. -->

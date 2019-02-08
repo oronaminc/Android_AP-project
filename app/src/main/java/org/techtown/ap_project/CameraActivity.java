@@ -2,8 +2,11 @@ package org.techtown.ap_project;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -16,10 +19,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
+import java.io.File;
+
+public class CameraActivity extends AppCompatActivity{
+
+    //activity request value 받아오는 glob value
+    private static final int REQUEST_TAKE_PHOTO = 22;
+    private static final int REQUEST_TAKE_ALBUM = 33;
 
     //카메라 찍고, 이미지 받아오는 부분
     Button Button_Camera;
+    Button Button_Send;
     ImageView imageView;
 
     //Global 변수 선언
@@ -32,6 +42,11 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
     //LinearLayout 불러오기
     LinearLayout container;
+
+    //이미지 파일 관련된 변수
+    File file;
+    Uri imageUri;
+    Uri photoURI, albumURI;
 
 
     @Override
@@ -47,11 +62,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         //화면에 어떤 요소를 배치할 지 받아오기
         container = (LinearLayout) findViewById(R.id.container);
-        imageView = (ImageView) findViewById(R.id.view);
+        imageView = (ImageView) findViewById(R.id.camera_image);
+        Button_Send = (Button) findViewById(R.id.send_file);
         Button_Camera = (Button) findViewById(R.id.camera);
-        Button_Camera.setOnClickListener(this);
-
-
 
         //Toolbar 설정
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -65,6 +78,33 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         //어떤 자료인 지 보여주기
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.activity_list_item, container, true);
+
+        //Image File 만들기
+        String sdcard = Environment.getExternalStorageDirectory()+"/AP/";
+        File dir = new File(sdcard);
+        if(!dir.exists()){dir.mkdirs();}
+        file = new File(dir, "photo.jpg");
+        Toast.makeText(getApplicationContext(), file.getAbsolutePath(),Toast.LENGTH_SHORT).show();
+
+        Button_Camera.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                Uri uri = FileProvider.getUriForFile(getApplicationContext(), "com.test.fileprovider", file);
+                imageUri = uri;
+                i.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                startActivityForResult(i,REQUEST_TAKE_PHOTO);
+            }
+        });
+
+        Button_Send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "파일을 보냈습니다.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
     //main_menu (우측 상단에 있는 버튼) 을 불러오는 함수
@@ -98,12 +138,14 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    /*
     //  사진을 찍고 사진을 가져와요, intent의 결과를 여기서 확인할 수 있음
     @Override
     public void onClick(View view){
         Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(i,0);
     }
+    */
 
     // PopupActivity에서 들어온 값을 받는 부분
     @Override
@@ -126,6 +168,13 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 toolbar = (Toolbar) findViewById(R.id.tool_bar);
                 setSupportActionBar(toolbar);
                 getSupportActionBar().setTitle(ip+" Connected");
+            }
+        } else if (requestCode == REQUEST_TAKE_PHOTO){
+            if(resultCode == RESULT_OK){
+                imageView.setImageURI(imageUri);
+                Toast.makeText(getApplicationContext(), imageUri+"에 저장되었습니다.", Toast.LENGTH_SHORT).show();
+            } else{
+                Toast.makeText(getApplicationContext(),"사진 찍기를 취소했습니다.", Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingRight="5dp"
+    android:paddingLeft="5dp"
     tools:context=".MainActivity"
     android:orientation="vertical">
 
@@ -31,7 +33,7 @@
         android:layout_width="match_parent"
         android:background="#ffcccc"
         android:gravity="center"
-        android:layout_weight="1.5">
+        android:layout_weight="1">
         <TextView
             android:id="@+id/text_view_fromMain"
             android:layout_width="match_parent"
@@ -46,7 +48,7 @@
         android:layout_width="match_parent"
         android:background="#32ff7e"
         android:gravity="center"
-        android:layout_weight="1.5">
+        android:layout_weight="1">
         <TextView
             android:id="@+id/text_view_fromUser"
             android:layout_width="match_parent"
@@ -62,23 +64,35 @@
         android:layout_height="0dp"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_weight="1">
+        android:layout_weight="1.1"
+        android:padding="5dp">
 
         <Button
             android:id="@+id/btnWrite"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
-            android:padding="17dp"
-            android:text="메모 및 사진 저장하기" />
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="7.5dp"
+            android:background="@drawable/button_round"
+            android:padding="10dp"
+            android:text="저장하기"
+            android:textSize="28sp"
+            android:textColor="#FFFFFF"
+            />
 
         <Button
             android:id="@+id/btnRead"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:padding="17dp"
-            android:text="메모 및 사진 업로드하기" />
+            android:layout_marginLeft="7.5dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/button_round"
+            android:padding="10dp"
+            android:text="파일 보내기"
+            android:textSize = "28sp"
+            android:textColor = "#FFFFFF"/>
 
     </LinearLayout>
 
