@@ -111,7 +111,7 @@ public class GalleryRecyclerViewAdapter extends RecyclerView.Adapter<GalleryRecy
     private void redirectGalleryDetailActivity(String imgPath) {
         Intent intent = new Intent(mContext, GalleryDetailActivity.class);
         intent.putExtra("imgPath", imgPath);
-        mContext.startActivity(intent);
+        mContext.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     public class GalleryRecyclerViewHolder extends RecyclerView.ViewHolder{

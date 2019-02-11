@@ -105,7 +105,6 @@ public class CameraActivity extends AppCompatActivity{
                     }
                     if (photoFile != null) {
                         // getUriForFile의 두 번째 인자는 Manifest provier의 authorites와 일치해야 함
-
                         Uri providerURI = FileProvider.getUriForFile(getApplicationContext(), "com.test.fileprovider", photoFile);
                         imageUri = providerURI;
 
@@ -176,7 +175,6 @@ public class CameraActivity extends AppCompatActivity{
         File storageDir = new File(Environment.getExternalStorageDirectory() + "/AP", "album");
 
         if (!storageDir.exists()) {
-            Log.i("mCurrentPhotoPath1", storageDir.toString());
             storageDir.mkdirs();
         }
 
@@ -221,6 +219,7 @@ public class CameraActivity extends AppCompatActivity{
             }
         } else if (requestCode == REQUEST_TAKE_PHOTO){
             if(resultCode == RESULT_OK){
+                galleryAddPic();
                 imageView.setImageURI(imageUri);
             } else{
                 Toast.makeText(getApplicationContext(),"사진 찍기를 취소했습니다.", Toast.LENGTH_SHORT).show();

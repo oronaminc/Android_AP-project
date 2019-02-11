@@ -38,7 +38,7 @@ public class PhotoUtil {
 
         while (cursor.moveToNext()) {
             strImage = cursor.getString(nCol);
-            if( strImage.startsWith(Environment.getExternalStorageDirectory().getAbsolutePath()+"/AP"))
+            if( strImage.startsWith(Environment.getExternalStorageDirectory().getAbsolutePath()+"/AP/album"))
             {
                 Photo Photo = new Photo(cursor.getString(columnIndexId), cursor.getString(columnIndexData));
                 photos.add(Photo);

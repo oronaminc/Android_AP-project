@@ -40,6 +40,7 @@ public class UploadMemoPicture extends AppCompatActivity {
 
     Button btnSave, btnWrite;
     EditText edit_text;
+    RecyclerView recyclerView;
     //TextView text_view_fromUser;
 
     //txt 파일 경로 정하기
@@ -53,9 +54,13 @@ public class UploadMemoPicture extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_memo_picture);
 
+
+
         btnSave = (Button )findViewById( R.id.btnSave);
         btnWrite = (Button)findViewById(R.id.btnWrite);
         edit_text = (EditText)findViewById(R.id.edit_text);
+        recyclerView = (RecyclerView) findViewById(R.id.main_rv);
+
         //text_view_fromUser = (TextView)findViewById(R.id.text_view_fromUser);
 
         //File 경로 없으면 만들어주기
@@ -63,21 +68,23 @@ public class UploadMemoPicture extends AppCompatActivity {
             dir.mkdirs();
         }
 
+
+        final GalleryRecyclerViewAdapter adapter = new GalleryRecyclerViewAdapter(getApplicationContext(), new PhotoUtil().getAllPhotoPathList(getApplicationContext()));
+
+        // recyclerview 그리드 형식의 3열로 셋팅
+        recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 3));
+        recyclerView.setAdapter(adapter);
+
         PermissionListener permissionListener = new PermissionListener() {
             // 접근권한 허용되었을 때
             @Override
             public void onPermissionGranted() {
-                RecyclerView recyclerView = findViewById(R.id.main_rv);
-                final GalleryRecyclerViewAdapter adapter = new GalleryRecyclerViewAdapter(getApplicationContext(), new PhotoUtil().getAllPhotoPathList(getApplicationContext()));
 
-                // recyclerview 그리드 형식의 3열로 셋팅
-                recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 3));
-                recyclerView.setAdapter(adapter);
 
                 btnSave.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        String selectedPhoto = "";
+                         String selectedPhoto = "";
                         for (Photo photo : adapter.getSelectedPhotos()) {
                             selectedPhoto += photo.getPath() + ", " + "\n";
                         }
