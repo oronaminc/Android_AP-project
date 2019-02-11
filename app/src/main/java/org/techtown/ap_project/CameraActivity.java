@@ -9,6 +9,7 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +21,9 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class CameraActivity extends AppCompatActivity{
 
@@ -30,7 +34,9 @@ public class CameraActivity extends AppCompatActivity{
     //카메라 찍고, 이미지 받아오는 부분
     Button Button_Camera;
     Button Button_Send;
+    Button Button_Setting;
     ImageView imageView;
+    String mCurrentPhotoPath;
 
     //Global 변수 선언
     String glob_ip;
@@ -65,6 +71,7 @@ public class CameraActivity extends AppCompatActivity{
         imageView = (ImageView) findViewById(R.id.camera_image);
         Button_Send = (Button) findViewById(R.id.send_file);
         Button_Camera = (Button) findViewById(R.id.camera);
+        Button_Setting =(Button) findViewById(R.id.setting);
 
         //Toolbar 설정
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -84,16 +91,32 @@ public class CameraActivity extends AppCompatActivity{
         File dir = new File(sdcard);
         if(!dir.exists()){dir.mkdirs();}
         file = new File(dir, "photo.jpg");
-        Toast.makeText(getApplicationContext(), file.getAbsolutePath(),Toast.LENGTH_SHORT).show();
 
         Button_Camera.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                Uri uri = FileProvider.getUriForFile(getApplicationContext(), "com.test.fileprovider", file);
-                imageUri = uri;
-                i.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-                startActivityForResult(i,REQUEST_TAKE_PHOTO);
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    File photoFile = null;
+                    try {
+                        photoFile = createImageFile();
+                    } catch (IOException ex) {
+                        Log.e("captureCamera Error", ex.toString());
+                    }
+                    if (photoFile != null) {
+                        // getUriForFile의 두 번째 인자는 Manifest provier의 authorites와 일치해야 함
+
+                        Uri providerURI = FileProvider.getUriForFile(getApplicationContext(), "com.test.fileprovider", photoFile);
+                        imageUri = providerURI;
+
+                        // 인텐트에 전달할 때는 FileProvier의 Return값인 content://로만!!, providerURI의 값에 카메라 데이터를 넣어 보냄
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerURI);
+
+                        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "저장공간이 접근 불가능한 기기입니다", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -104,6 +127,13 @@ public class CameraActivity extends AppCompatActivity{
             }
         });
 
+        Button_Setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), UploadMemoPicture.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -138,14 +168,34 @@ public class CameraActivity extends AppCompatActivity{
         }
     }
 
-    /*
-    //  사진을 찍고 사진을 가져와요, intent의 결과를 여기서 확인할 수 있음
-    @Override
-    public void onClick(View view){
-        Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(i,0);
+    public File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + ".jpg";
+        File imageFile = null;
+        File storageDir = new File(Environment.getExternalStorageDirectory() + "/AP", "album");
+
+        if (!storageDir.exists()) {
+            Log.i("mCurrentPhotoPath1", storageDir.toString());
+            storageDir.mkdirs();
+        }
+
+        imageFile = new File(storageDir, imageFileName);
+        mCurrentPhotoPath = imageFile.getAbsolutePath();
+
+        return imageFile;
     }
-    */
+
+    private void galleryAddPic(){
+        Log.i("galleryAddPic", "Call");
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        // 해당 경로에 있는 파일을 객체화(새로 파일을 만든다는 것으로 이해하면 안 됨)
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        sendBroadcast(mediaScanIntent);
+        Toast.makeText(this, contentUri.getPath() + "에 저장되었습니다.", Toast.LENGTH_SHORT).show();
+    }
 
     // PopupActivity에서 들어온 값을 받는 부분
     @Override
@@ -172,7 +222,6 @@ public class CameraActivity extends AppCompatActivity{
         } else if (requestCode == REQUEST_TAKE_PHOTO){
             if(resultCode == RESULT_OK){
                 imageView.setImageURI(imageUri);
-                Toast.makeText(getApplicationContext(), imageUri+"에 저장되었습니다.", Toast.LENGTH_SHORT).show();
             } else{
                 Toast.makeText(getApplicationContext(),"사진 찍기를 취소했습니다.", Toast.LENGTH_SHORT).show();
             }

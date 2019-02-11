@@ -7,22 +7,22 @@
     android:paddingRight="5dp"
     android:paddingLeft="5dp"
     tools:context=".MainActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
 
-    <ImageView
-        android:id="@+id/imageView8"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/main_rv"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
-        android:padding="10dp"
-        app:srcCompat="@mipmap/ic_launcher_round" />
+        android:layout_weight="5"/>
 
     <EditText
         android:id="@+id/edit_text"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.5"
+        android:layout_weight="1"
         android:background="#ecf0f1"
         android:gravity="center"
         android:hint="여기에 입력해주세요"
@@ -31,7 +31,7 @@
     <ScrollView
         android:layout_height="0dp"
         android:layout_width="match_parent"
-        android:background="#ffcccc"
+        android:background="#FFF2AB"
         android:gravity="center"
         android:layout_weight="1">
         <TextView
@@ -43,6 +43,7 @@
             android:textSize="16dp" />
     </ScrollView>
 
+    <!--
     <ScrollView
         android:layout_height="0dp"
         android:layout_width="match_parent"
@@ -57,42 +58,42 @@
             android:text="User가 입력한 메모가 표시되는 곳입니다."
             android:textSize="16dp"/>
     </ScrollView>
+    -->
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:orientation="horizontal"
+        android:layout_weight="1"
         android:gravity="center"
-        android:layout_weight="1.1"
+        android:orientation="horizontal"
         android:padding="5dp">
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="7.5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_round"
+            android:padding="10dp"
+            android:text="저장하기"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp" />
 
         <Button
             android:id="@+id/btnWrite"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="7.5dp"
-            android:background="@drawable/button_round"
-            android:padding="10dp"
-            android:text="저장하기"
-            android:textSize="28sp"
-            android:textColor="#FFFFFF"
-            />
-
-        <Button
-            android:id="@+id/btnRead"
-            android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="7.5dp"
-            android:layout_marginRight="5dp"
             android:background="@drawable/button_round"
             android:padding="10dp"
             android:text="파일 보내기"
-            android:textSize = "28sp"
-            android:textColor = "#FFFFFF"/>
+            android:textColor="#FFFFFF"
+            android:textSize="28sp" />
 
     </LinearLayout>
 
