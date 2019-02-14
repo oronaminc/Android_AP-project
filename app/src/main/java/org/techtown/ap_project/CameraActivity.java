@@ -1,7 +1,10 @@
 package org.techtown.ap_project;
 
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,17 +18,43 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CameraActivity extends AppCompatActivity{
+
+    //json형식으로 정보 받아오는 URL
+    final String url = "https://api.myjson.com/bins/19nnce";
 
     //activity request value 받아오는 glob value
     private static final int REQUEST_TAKE_PHOTO = 22;
@@ -49,10 +78,26 @@ public class CameraActivity extends AppCompatActivity{
     //LinearLayout 불러오기
     LinearLayout container;
 
+    //ListView 만들기
+    ListView listView;
+
     //이미지 파일 관련된 변수
     File file;
     Uri imageUri;
     Uri photoURI, albumURI;
+
+
+    //새로운 Point 배열 class를 만들어줌, 배열안에 x,y값을 갖도록
+    public Point[] pointArr;
+    //새로운 PolygonOptions 배열을 만들어줌, PolygonOptions는 원래 있던 Class임.
+    public PolygonOptions[] fieldArr;
+    //지도에 이용할 점, 지도 정의
+    MapFragment mapFragment;
+    Double pointX, pointY;
+    String pointName;
+    String fieldName;
+    String fieldLocation;
+    GoogleMap map;
 
 
     @Override
@@ -67,7 +112,8 @@ public class CameraActivity extends AppCompatActivity{
         glob_user = intent.getExtras().getString("glob_user");
 
         //화면에 어떤 요소를 배치할 지 받아오기
-        container = (LinearLayout) findViewById(R.id.container);
+        //container = (LinearLayout) findViewById(R.id.container);
+        listView = (ListView) findViewById(R.id.listView);
         imageView = (ImageView) findViewById(R.id.camera_image);
         Button_Send = (Button) findViewById(R.id.send_file);
         Button_Camera = (Button) findViewById(R.id.camera);
@@ -82,9 +128,42 @@ public class CameraActivity extends AppCompatActivity{
             getSupportActionBar().setTitle("AP Disconnected");
         }
 
-        //어떤 자료인 지 보여주기
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.activity_list_item, container, true);
+        //json을 GSON으로 받아드리는 부분(HTTP 통신을 통해서)
+        RequestQueue rq = Volley.newRequestQueue(this);
+        StringRequest request = new StringRequest(
+                Request.Method.GET,
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        dataMining(response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                    }
+                }
+        ){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                return params;
+            }
+        };
+
+        request.setShouldCache(false);
+        rq.add(request);
+
+        //Fragement 에 지도 그리기
+        FragmentManager fragmentManager = getFragmentManager();
+        mapFragment = (MapFragment)fragmentManager.findFragmentById(R.id.map);
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                map = googleMap;
+            }
+        });
 
         //Image File 만들기
         String sdcard = Environment.getExternalStorageDirectory()+"/AP/";
@@ -167,6 +246,73 @@ public class CameraActivity extends AppCompatActivity{
         }
     }
 
+    //지도에 나오는 요소들 표시하기
+    public void dataMining(String response){
+
+        PointAdapter adapter = new PointAdapter();
+
+        Gson gson = new Gson();
+        FieldResult field = gson.fromJson(response, FieldResult.class);
+
+        // 도형이 몇개 있는 지
+        int fieldNum = field.fieldResult.size();
+
+        fieldArr = new PolygonOptions[fieldNum];
+
+        for (int j = 0; j< fieldNum; j++){
+            //도형안에 점이 몇개 있는 지
+            String fieldName = field.fieldResult.get(j).fieldName;
+            int pointNum = field.fieldResult.get(j).numbersOfPoint;
+
+            pointArr = new Point[pointNum];
+            for(int i = 0; i<pointNum; i++) {
+                pointName = field.fieldResult.get(j).fieldArea.get(i).pointName;
+                pointX = Double.parseDouble(field.fieldResult.get(j).fieldArea.get(i).pointX);
+                pointY = Double.parseDouble(field.fieldResult.get(j).fieldArea.get(i).pointY);
+
+                LatLng pointValue = new LatLng(pointX,pointY);
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(pointValue);
+                markerOptions.title(fieldName);
+                markerOptions.snippet(pointName);
+                map.addMarker(markerOptions);
+
+                //polygon 좌표 세팅하기
+                Point point = new Point();
+                point.x = pointX;
+                point.y = pointY;
+                pointArr[i] = point; //i는 for문에서 쓰는 int 변수
+            }
+
+            PolygonOptions rectOptions = new PolygonOptions()
+                    .strokeColor(Color.RED)
+                    .strokeWidth(5);
+            for(int i=0; i<pointNum; i++){
+                rectOptions.add(new LatLng(pointArr[i].x, pointArr[i].y));
+            }
+            rectOptions.add(new LatLng(pointArr[0].x, pointArr[0].y));
+            map.addPolygon(rectOptions);
+            fieldArr[j] = rectOptions;
+
+            adapter.addItem(new ListItem(field.fieldResult.get(j).fieldName, field.fieldResult.get(j).fieldLocation));
+        }
+
+        map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(pointX,pointY)));
+        map.animateCamera(CameraUpdateFactory.zoomTo(13));
+
+        listView.setAdapter(adapter);
+
+    }
+
+
+
+    //점으로 사용할 클래스 정의하기
+    public class Point{
+        public double x;
+        public double y;
+    }
+
+    //파일 알아서 생성하기
     public File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -237,7 +383,45 @@ public class CameraActivity extends AppCompatActivity{
         intent.putExtra("glob_port", glob_port);
         intent.putExtra("glob_user", glob_user);
         startActivity(intent);
+    }
 
+    // 점에 대한 어댑터 정의
+    class PointAdapter extends BaseAdapter {
+
+        ArrayList<ListItem> items = new ArrayList<ListItem>();
+
+        //어뎁터에 추가해주는 부분
+        public void addItem(ListItem item){
+            items.add(item);
+        }
+
+        @Override
+        public int getCount() {
+            return items.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return items.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            //변수에 값을 넣어주는 View class 정의
+            ListItemView view = new ListItemView(getApplicationContext());
+            //변수 자체를 정의함
+            ListItem item = items.get(position);
+
+            view.setSubjuect(item.getSubject());
+            view.setLocation(item.getLocation());
+
+            return view;
+        }
     }
 
 }

@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         if(getIntent().getExtras() == null){
             // 로딩화면 띄우기
             Intent intent2 = new Intent(this, MainScreen.class);
-            startActivity(intent2);
+            startActivity(intent2.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
         }else{
             Intent intent = getIntent();
             glob_ip = intent.getExtras().getString("glob_ip");

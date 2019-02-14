@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 public class ListItemView extends LinearLayout {
 
-    TextView subjuectText;
+    TextView subjectText;
     TextView locationText;
 
     //constructor 정의
@@ -27,14 +27,14 @@ public class ListItemView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.activity_list_item, this, true);
 
-        subjuectText = (TextView) findViewById(R.id.subjectText);
+        subjectText = (TextView) findViewById(R.id.subjectText);
         locationText = (TextView) findViewById(R.id.locationText);
 
     }
 
    // 받아 온 값 설정하는 메서드
     public void setSubjuect(String sub){
-        subjuectText.setText(sub);
+        subjectText.setText(sub);
     }
 
     public void setLocation(String loc){
