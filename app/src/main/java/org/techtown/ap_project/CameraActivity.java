@@ -38,6 +38,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
@@ -54,7 +55,7 @@ import java.util.Map;
 public class CameraActivity extends AppCompatActivity{
 
     //json형식으로 정보 받아오는 URL
-    final String url = "https://api.myjson.com/bins/19nnce";
+    final String url = "https://api.myjson.com/bins/d1s32";
 
     //activity request value 받아오는 glob value
     private static final int REQUEST_TAKE_PHOTO = 22;
@@ -66,6 +67,8 @@ public class CameraActivity extends AppCompatActivity{
     Button Button_Setting;
     ImageView imageView;
     String mCurrentPhotoPath;
+    File storageDir;
+    Integer photoName = 0;
 
     //Global 변수 선언
     String glob_ip;
@@ -95,9 +98,11 @@ public class CameraActivity extends AppCompatActivity{
     MapFragment mapFragment;
     Double pointX, pointY;
     String pointName;
-    String fieldName;
-    String fieldLocation;
+    FieldResult field;
     GoogleMap map;
+    Integer j;
+    Uri uri;
+    String fieldPath;
 
 
     @Override
@@ -169,7 +174,7 @@ public class CameraActivity extends AppCompatActivity{
         String sdcard = Environment.getExternalStorageDirectory()+"/AP/";
         File dir = new File(sdcard);
         if(!dir.exists()){dir.mkdirs();}
-        file = new File(dir, "photo.jpg");
+        //file = new File(dir, "photo.jpg");
 
         Button_Camera.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -209,6 +214,8 @@ public class CameraActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), UploadMemoPicture.class);
+                intent.putExtra("fieldPath", fieldPath);
+                intent.putExtra("pointName", pointName);
                 startActivity(intent);
             }
         });
@@ -249,6 +256,7 @@ public class CameraActivity extends AppCompatActivity{
     //지도에 나오는 요소들 표시하기
     public void dataMining(String response){
 
+        //어댑터 선언
         PointAdapter adapter = new PointAdapter();
 
         Gson gson = new Gson();
@@ -261,10 +269,11 @@ public class CameraActivity extends AppCompatActivity{
 
         for (int j = 0; j< fieldNum; j++){
             //도형안에 점이 몇개 있는 지
-            String fieldName = field.fieldResult.get(j).fieldName;
+            String fieldName = field.fieldName;
+            fieldPath = field.fieldResult.get(j).fieldKey;
             int pointNum = field.fieldResult.get(j).numbersOfPoint;
 
-            pointArr = new Point[pointNum];
+            pointArr =new Point[pointNum];
             for(int i = 0; i<pointNum; i++) {
                 pointName = field.fieldResult.get(j).fieldArea.get(i).pointName;
                 pointX = Double.parseDouble(field.fieldResult.get(j).fieldArea.get(i).pointX);
@@ -273,7 +282,7 @@ public class CameraActivity extends AppCompatActivity{
                 LatLng pointValue = new LatLng(pointX,pointY);
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(pointValue);
-                markerOptions.title(fieldName);
+                markerOptions.title(fieldPath);
                 markerOptions.snippet(pointName);
                 map.addMarker(markerOptions);
 
@@ -294,11 +303,43 @@ public class CameraActivity extends AppCompatActivity{
             map.addPolygon(rectOptions);
             fieldArr[j] = rectOptions;
 
-            adapter.addItem(new ListItem(field.fieldResult.get(j).fieldName, field.fieldResult.get(j).fieldLocation));
+
         }
 
+        adapter.addItem(new ListItem(field.fieldName, field.fieldLocation));
+
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                fieldPath = marker.getTitle();
+                pointName = marker.getSnippet();
+                try{
+
+
+                    String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/AP/"+marker.getTitle()+"/"+marker.getSnippet()+"/point1.jpg";
+                    File dir = new File(path);
+
+                    if (!dir.exists()) {
+                        imageView.setImageResource(R.drawable.noimage);
+                    } else {
+                        imageView.setImageURI(Uri.parse(path));
+                    }
+
+
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+
+                map.moveCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+                map.animateCamera(CameraUpdateFactory.zoomTo(19));
+
+                return false;
+            }
+        });
+
         map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(pointX,pointY)));
-        map.animateCamera(CameraUpdateFactory.zoomTo(13));
+        map.animateCamera(CameraUpdateFactory.zoomTo(14));
 
         listView.setAdapter(adapter);
 
@@ -315,14 +356,19 @@ public class CameraActivity extends AppCompatActivity{
     //파일 알아서 생성하기
     public File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + ".jpg";
+        //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File imageFile = null;
-        File storageDir = new File(Environment.getExternalStorageDirectory() + "/AP", "album");
+
+        File storageDir = new File(Environment.getExternalStorageDirectory() + "/AP", fieldPath+"/"+pointName);
 
         if (!storageDir.exists()) {
             storageDir.mkdirs();
         }
+
+        String[] list = storageDir.list();
+        photoName = list.length + 1;
+        String imageFileName = "point" + photoName + ".jpg";
+
 
         imageFile = new File(storageDir, imageFileName);
         mCurrentPhotoPath = imageFile.getAbsolutePath();
@@ -369,6 +415,12 @@ public class CameraActivity extends AppCompatActivity{
                 imageView.setImageURI(imageUri);
             } else{
                 Toast.makeText(getApplicationContext(),"사진 찍기를 취소했습니다.", Toast.LENGTH_SHORT).show();
+            }
+        } else if(requestCode == REQUEST_TAKE_ALBUM){
+            if(resultCode == RESULT_OK){
+                Toast.makeText(getApplicationContext(),"저장했습니다.", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(getApplicationContext(),"취소했습니다.", Toast.LENGTH_SHORT).show();
             }
         }
     }

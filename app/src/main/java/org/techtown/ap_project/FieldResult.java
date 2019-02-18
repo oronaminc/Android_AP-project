@@ -4,4 +4,6 @@ import java.util.ArrayList;
 
 public class FieldResult {
     ArrayList<FieldArea> fieldResult = new ArrayList<FieldArea>();
+    String fieldName;
+    String fieldLocation;
 }
