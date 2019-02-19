@@ -133,7 +133,7 @@ public class CameraActivity extends AppCompatActivity{
             getSupportActionBar().setTitle("AP Disconnected");
         }
 
-        //json을 GSON으로 받아드리는 부분(HTTP 통신을 통해서)
+        //json을 GSON으로 받아드리는 부분(HTTP 통신을 통해서) volly 쓰는 곳
         RequestQueue rq = Volley.newRequestQueue(this);
         StringRequest request = new StringRequest(
                 Request.Method.GET,
@@ -141,6 +141,7 @@ public class CameraActivity extends AppCompatActivity{
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        //Toast.makeText(getApplicationContext(),response, Toast.LENGTH_SHORT).show();
                         dataMining(response);
                     }
                 },
