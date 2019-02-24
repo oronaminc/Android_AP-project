@@ -24,7 +24,7 @@ Android_AP-project with krinfra
 <img width="200" src="https://user-images.githubusercontent.com/37185394/52929542-26246900-3388-11e9-9ed8-ff86b5bb0c48.PNG"/>
 </div>
 
-# dependencies
+### dependencies
 ```java
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -47,4 +47,57 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation project(':json-simple-1.1.1')
 }
+```
+
+### AndroidManifest.xml
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.techtown.ap_project">
+    <uses-permission android:name="android.permisson.CAMERA" />
+    <uses-feature android:name="android.hardware.camera2" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/logo2"
+        android:label="@string/app_name"
+        android:noHistory="true"
+        android:roundIcon="@drawable/logo2"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCDhPjj1TzueNtfaFzkOrmMomfBp844SY8" />
+
+        <activity android:name=".GalleryDetailActivity"></activity>
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.test.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+        <activity android:name=".UploadMemoPicture" />
+        <activity android:name=".CameraActivity" />
+        <activity android:name=".WorkList" />
+        <activity
+            android:name=".PopupActivity"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity android:name=".MainScreen" />
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
 ```
