@@ -7,7 +7,7 @@ Android_AP-project with krinfra
 2. Memo Activity
 3. Google Map Activity
 4. IP/PORT/USER Input Activity
-5. TCP/IP Socket Communication
+5. TCP/IP Socket Communication => Android-AP-project(server) :
 6. Customed Grid Album Activity (Made by Recycling View)
 7. Work List Activity (Made by ListView)
 
@@ -73,7 +73,6 @@ dependencies {
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCDhPjj1TzueNtfaFzkOrmMomfBp844SY8" />
-
         <activity android:name=".GalleryDetailActivity"></activity>
         <provider
             android:name="android.support.v4.content.FileProvider"
