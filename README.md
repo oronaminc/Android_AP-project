@@ -1,7 +1,18 @@
 # Android_AP-project
 Android_AP-project with krinfra
 
-ScreenShot
+## Function
+
+1 Camera Activity
+2 Memo Activity
+3 Google Map Activity
+4 IP/PORT/USER Input Activity
+5 TCP/IP Socket Communication
+6 Customed Grid Album Activity (Made by Recycling View)
+7 Work List Activity (Made by ListView)
+
+
+## ScreenShot
 ----------
 
 <div>
