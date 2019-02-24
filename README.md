@@ -13,7 +13,6 @@ Android_AP-project with krinfra
 
 
 ## ScreenShot
-----------
 <div>
 <img width="200" src="https://user-images.githubusercontent.com/37185394/52929543-26246900-3388-11e9-98e1-916c7d99411f.PNG"/>
 <img width="200" src="https://user-images.githubusercontent.com/37185394/52929544-26bcff80-3388-11e9-811b-5f81259fa0c7.PNG"/>
@@ -27,6 +26,7 @@ Android_AP-project with krinfra
 
 # dependencies
 ```java
+dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:animated-vector-drawable:28.0.0'
@@ -46,4 +46,5 @@ Android_AP-project with krinfra
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation project(':json-simple-1.1.1')
+}
 ```
