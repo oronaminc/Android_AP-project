@@ -7,7 +7,7 @@ Android_AP-project with krinfra
 2. Memo Activity
 3. Google Map Activity
 4. IP/PORT/USER Input Activity
-5. TCP/IP Socket Communication => Android-AP-project(server) :
+5. TCP/IP Socket Communication => Android-AP-project(server) : https://github.com/oronaminc/Android_AP-project-server-
 6. Customed Grid Album Activity (Made by Recycling View)
 7. Work List Activity (Made by ListView)
 
