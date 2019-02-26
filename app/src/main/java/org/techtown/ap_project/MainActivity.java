@@ -5,7 +5,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.DhcpInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -13,11 +15,24 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import org.json.simple.JSONObject;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.Socket;
+import java.net.SocketException;
+import java.util.Enumeration;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -25,12 +40,16 @@ public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSION_STORAGE = 1111;
 
     //Global 변수 선언
-    String glob_ip;
-    String glob_port;
-    String glob_user;
+    String glob_ip="";
+    String glob_port="";
+    String glob_user="";
+    String glob_json;
 
     //Toolbar 선언
     Toolbar toolbar;
+
+    //쓰레드 처리
+    Boolean run_flag = false;
 
 
     @Override
@@ -55,11 +74,12 @@ public class MainActivity extends AppCompatActivity {
         // 툴바 사용 설정 및 제목 지정
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
-        if (glob_ip != null){
+        if (glob_ip != "" && glob_port != ""){
             getSupportActionBar().setTitle(glob_ip+" Connected");
         }else{
             getSupportActionBar().setTitle("AP Disconnected");
         }
+
     }
 
     // ip, port, user 를 공용으로 쓰게 하는 부분
@@ -108,13 +128,34 @@ public class MainActivity extends AppCompatActivity {
 
     // 카메라 찍는 곳으로 넘어가는 메서드
     public void gotoCamera(View v){
-        //ip, user, port는 기본적으로 넘겨줌
-        Intent intent = new Intent(this, CameraActivity.class);
-        intent.putExtra("glob_ip", glob_ip);
-        intent.putExtra("glob_port", glob_port);
-        intent.putExtra("glob_user", glob_user);
-        startActivity(intent);
 
+
+        if(glob_ip != "" && glob_port != "") {
+
+            //ip, user, port는 기본적으로 넘겨줌
+            Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
+            intent.putExtra("glob_ip", glob_ip);
+            intent.putExtra("glob_port", glob_port);
+            intent.putExtra("glob_user", glob_user);
+            startActivity(intent);
+        } else {
+            Toast.makeText(getApplicationContext(), "올바른 ip, port를 입력하세요", Toast.LENGTH_SHORT).show();
+        }
+
+
+
+
+        /*
+        StartThread thread = new StartThread();
+        thread.start();
+
+        if(run_flag) {
+
+
+        }else {
+            Toast.makeText(getApplicationContext(), "올바른 ip, port, user를 입력하세요", Toast.LENGTH_SHORT).show();
+        }
+        */
     }
 
     // 작업 리스트로 넘어가는 메서드
@@ -132,9 +173,9 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode==1){
             if(resultCode==RESULT_OK){
                 //데이터받아서 변수에 저장하는 부분
-                String ip = data.getStringExtra("ip");
-                String port = data.getStringExtra("port");
-                String user = data.getStringExtra("user");
+                String ip = data.getStringExtra("glob_ip");
+                String port = data.getStringExtra("glob_port");
+                String user = data.getStringExtra("glob_user");
 
                 //global 변수로 데이터 넘겨주기
                 glob_ip=ip;
@@ -201,4 +242,35 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
+
+
+
+    /*
+    class StartThread extends Thread{
+        public void run(){
+            try{
+                Socket socket = new Socket(glob_ip, Integer.valueOf(glob_port));
+                ObjectOutputStream outstream = new ObjectOutputStream(socket.getOutputStream());
+                outstream.writeObject("서버에 접속 성공했어요");
+                outstream.flush();
+
+                ObjectInputStream instream = new ObjectInputStream(socket.getInputStream());
+                Object input = instream.readObject();
+                JSONObject jsonObject = (JSONObject) input;
+                String json = jsonObject.toJSONString().trim();
+                Log.d("ClientThread", "AP Connected");
+
+                socket.close();
+                run_flag = true;
+
+
+
+
+
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+    */
 }

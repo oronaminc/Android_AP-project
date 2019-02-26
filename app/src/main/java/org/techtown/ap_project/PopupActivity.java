@@ -48,9 +48,9 @@ public class PopupActivity extends Activity {
         input_user = (EditText)findViewById(R.id.input_user);
 
         //사용자가 데이터를 입력했는 지 여부를 검사하기
-        intent.putExtra("ip",input_ip.getText().toString());
-        intent.putExtra("port",input_port.getText().toString());
-        intent.putExtra("user",input_user.getText().toString());
+        intent.putExtra("glob_ip",input_ip.getText().toString());
+        intent.putExtra("glob_port",input_port.getText().toString());
+        intent.putExtra("glob_user",input_user.getText().toString());
 
         setResult(RESULT_OK,intent);
 

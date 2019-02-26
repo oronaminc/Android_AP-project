@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.techtown.ap_project">
-    <!-- 많은 기능을 사용할 수 있도록 permision을 줍니다 -->
     <uses-permission android:name="android.permisson.CAMERA" />
     <uses-feature android:name="android.hardware.camera2" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:allowBackup="true"
         android:icon="@drawable/logo2"
@@ -17,7 +17,6 @@
         android:roundIcon="@drawable/logo2"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCDhPjj1TzueNtfaFzkOrmMomfBp844SY8" />
@@ -33,10 +32,9 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
         <activity android:name=".UploadMemoPicture" />
         <activity android:name=".CameraActivity" />
-        <activity android:name=".WorkList" /> <!-- 팝업 Activity, 팝업 스타일이라고 명시해줍니다. -->
+        <activity android:name=".WorkList" />
         <activity
             android:name=".PopupActivity"
             android:theme="@android:style/Theme.Dialog" />

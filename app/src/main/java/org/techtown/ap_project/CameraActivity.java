@@ -8,6 +8,7 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -37,6 +38,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -44,13 +46,23 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.gson.Gson;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Writer;
+import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 public class CameraActivity extends AppCompatActivity{
 
@@ -74,6 +86,11 @@ public class CameraActivity extends AppCompatActivity{
     String glob_ip;
     String glob_port;
     String glob_user;
+    String glob_response="";
+
+    //스래드 변수 선언
+    String set_ip;
+    String set_port;
 
     //Toolbar 선언
     Toolbar toolbar;
@@ -90,6 +107,7 @@ public class CameraActivity extends AppCompatActivity{
     Uri photoURI, albumURI;
 
 
+
     //새로운 Point 배열 class를 만들어줌, 배열안에 x,y값을 갖도록
     public Point[] pointArr;
     //새로운 PolygonOptions 배열을 만들어줌, PolygonOptions는 원래 있던 Class임.
@@ -103,6 +121,15 @@ public class CameraActivity extends AppCompatActivity{
     Integer j;
     Uri uri;
     String fieldPath;
+
+    //소켓통신 핸들러 정이
+    Handler handler = new Handler();
+
+    //데이터 받아올 때 필요한 변수
+    String sdcard = Environment.getExternalStorageDirectory()+"/AP/";
+    File dir = new File(sdcard);
+    JSONObject obj;
+    JSONParser jsonParser = new JSONParser();
 
 
     @Override
@@ -133,6 +160,9 @@ public class CameraActivity extends AppCompatActivity{
             getSupportActionBar().setTitle("AP Disconnected");
         }
 
+
+
+        /*
         //json을 GSON으로 받아드리는 부분(HTTP 통신을 통해서) volly 쓰는 곳
         RequestQueue rq = Volley.newRequestQueue(this);
         StringRequest request = new StringRequest(
@@ -160,6 +190,7 @@ public class CameraActivity extends AppCompatActivity{
 
         request.setShouldCache(false);
         rq.add(request);
+        */
 
         //Fragement 에 지도 그리기
         FragmentManager fragmentManager = getFragmentManager();
@@ -176,6 +207,8 @@ public class CameraActivity extends AppCompatActivity{
         File dir = new File(sdcard);
         if(!dir.exists()){dir.mkdirs();}
         //file = new File(dir, "photo.jpg");
+
+
 
         Button_Camera.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -201,12 +234,18 @@ public class CameraActivity extends AppCompatActivity{
                 } else {
                     Toast.makeText(getApplicationContext(), "저장공간이 접근 불가능한 기기입니다", Toast.LENGTH_SHORT).show();
                 }
+
+                //ClientThread thread = new ClientThread(glob_ip, glob_port);
+                //thread.start();
             }
         });
 
         Button_Send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String addr = glob_ip;
+                ConnectThread thread = new ConnectThread(addr);
+                thread.start();
                 Toast.makeText(getApplicationContext(), "파일을 보냈습니다.", Toast.LENGTH_SHORT).show();
             }
         });
@@ -218,10 +257,28 @@ public class CameraActivity extends AppCompatActivity{
                 intent.putExtra("fieldPath", fieldPath);
                 intent.putExtra("pointName", pointName);
                 startActivity(intent);
+
             }
         });
 
     }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        //ClientThread thread = new ClientThread(glob_ip, glob_port);
+        //thread.start();
+
+
+        try{
+            ListenThread thread2 = new ListenThread(glob_ip);
+            thread2.start();
+        }catch(Exception e){
+            Log.d("Client : ", "NO LISTENING");
+            e.printStackTrace();
+        }
+    }
+
 
     //main_menu (우측 상단에 있는 버튼) 을 불러오는 함수
     @Override
@@ -260,6 +317,8 @@ public class CameraActivity extends AppCompatActivity{
         //어댑터 선언
         PointAdapter adapter = new PointAdapter();
 
+
+
         Gson gson = new Gson();
         FieldResult field = gson.fromJson(response, FieldResult.class);
 
@@ -285,6 +344,15 @@ public class CameraActivity extends AppCompatActivity{
                 markerOptions.position(pointValue);
                 markerOptions.title(fieldPath);
                 markerOptions.snippet(pointName);
+
+                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/AP/"+fieldPath+"/"+pointName;
+                File f = new File(path);
+                //String[] list  = f.list();
+                //Log.d("Tag", String.valueOf(list.length));
+                if(f.exists()) {
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                }
+
                 map.addMarker(markerOptions);
 
                 //polygon 좌표 세팅하기
@@ -307,6 +375,8 @@ public class CameraActivity extends AppCompatActivity{
 
         }
 
+        Double x = pointX;
+        Double y = pointY;
         adapter.addItem(new ListItem(field.fieldName, field.fieldLocation));
 
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -314,12 +384,18 @@ public class CameraActivity extends AppCompatActivity{
             public boolean onMarkerClick(Marker marker) {
                 fieldPath = marker.getTitle();
                 pointName = marker.getSnippet();
-                try{
 
+                String path2 = Environment.getExternalStorageDirectory().getAbsolutePath()+"/AP/"+fieldPath+"/"+pointName;
+                File f = new File(path2);
+                if(f.exists()) {
+                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                }
+
+
+                try{
 
                     String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/AP/"+marker.getTitle()+"/"+marker.getSnippet()+"/point1.jpg";
                     File dir = new File(path);
-
                     if (!dir.exists()) {
                         imageView.setImageResource(R.drawable.noimage);
                     } else {
@@ -394,9 +470,10 @@ public class CameraActivity extends AppCompatActivity{
         if(requestCode==1){
             if(resultCode==RESULT_OK){
                 //데이터받아서 변수에 저장하는 부분
-                String ip = data.getStringExtra("ip");
-                String port = data.getStringExtra("port");
-                String user = data.getStringExtra("user");
+                String ip = data.getStringExtra("glob_ip");
+                String port = data.getStringExtra("glob_port");
+                String user = data.getStringExtra("glob_user");
+                //String response = data.getStringExtra("glob_json");
 
                 //global 변수로 데이터 넘겨주기
                 glob_ip=ip;
@@ -404,6 +481,8 @@ public class CameraActivity extends AppCompatActivity{
                 glob_user=user;
 
                 Toast.makeText(getApplicationContext(),  "IP : "+glob_ip+"\n"+"PORT : "+glob_port+"\n"+"USER : "+glob_user, Toast.LENGTH_LONG).show();
+
+
 
                 //ip가 연결 되었을 때 툴바 제목 바꾸어주기
                 toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -477,4 +556,125 @@ public class CameraActivity extends AppCompatActivity{
         }
     }
 
+
+    /*
+    //소켓 통신에 대한 쓰레드 구축
+    class ClientThread extends Thread{
+        String hostname;
+        Integer hostport;
+        public ClientThread(String set_ip, String set_port){
+            hostname = set_ip;
+            hostport = Integer.valueOf(set_port);
+        }
+
+        public void run(){
+            try {
+                Socket socket = new Socket(hostname, hostport);
+
+                ObjectInputStream instream = new ObjectInputStream(socket.getInputStream());
+                //final 키워드를 붙여서 상수처럼 접근할 수 있도록 해줍니다.
+                final Object input = instream.readObject();
+                //final String jsonObject = (String) input;
+                JSONObject jsonObject = (JSONObject) input;
+                final String response = jsonObject.toJSONString().trim();
+
+                ObjectOutputStream outstream = new ObjectOutputStream(socket.getOutputStream());
+                outstream.writeObject("서버로 보냄");
+                outstream.flush();
+                Log.d("ClientThread", "서버로 보냄");
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        dataMining(response);
+                        Toast.makeText(getApplicationContext(),"제대로 실행되었습니다",Toast.LENGTH_SHORT).show();
+                        //textView.setText("받은 데이터 : " + name + email + age);
+                    }
+                });
+
+                socket.close();
+
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+    */
+
+
+    class ConnectThread extends Thread {
+        String hostname;
+        public ConnectThread(String addr) {
+            hostname = addr;
+        }
+        public void run() {
+            try {
+                JSONObject obj = (JSONObject) jsonParser.parse(new FileReader(sdcard+"/data.json"));
+                int port = 11001;
+                Socket sock = new Socket(hostname, port);
+                ObjectOutputStream outstream = new ObjectOutputStream(sock.getOutputStream());
+                //outstream.writeObject(input01.getText().toString().trim());
+                outstream.writeObject(obj);
+                outstream.flush();
+                Log.d("MainActivity", "서버로 보낼 메시지 : " + "서버로 잘 보냈습니다");
+                sock.close();
+
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
+
+        }
+    }
+
+
+    class ListenThread extends Thread {
+        String hostname;
+
+        public ListenThread(String addr) {
+            hostname = addr;
+        }
+
+        Writer output = null;
+
+        public void run() {
+            try {
+                while (true) {
+                    int port = 11002;
+                    Socket sock = new Socket(hostname, port);
+                    ObjectInputStream instream = new ObjectInputStream(sock.getInputStream());
+                    obj = (JSONObject) instream.readObject();
+                    final String json = obj.toJSONString().trim();
+                    //obj.put("name", "@서버에서왔쪄욤@");
+                    //final String name = (String) obj.get("name");
+                    Log.d("MainActivity", "서버에서 받은 메시지 : " + json);
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                if (!dir.exists()) {
+                                    dir.mkdirs();
+                                }
+                                dataMining(json);
+                                File file = new File(dir + "/data.json");
+                                output = new BufferedWriter(new FileWriter(file));
+                                output.write(obj.toString());
+                                output.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            Toast.makeText(getApplicationContext(), dir + "/data.json에 저장했어요", Toast.LENGTH_SHORT).show();
+                            Log.d("ClientReceiver : ", json);
+                        }
+                    });
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+        }
+    }
 }
