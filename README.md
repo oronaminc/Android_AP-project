@@ -25,9 +25,7 @@ Android_AP-project with krinfra
 </div>
 
 ## Video
-<iframe width="560" height="315" src="https://www.youtube.com/embed/p4VJ49GadUw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-<iframe width="640" height="360" src="https://www.youtube.com/embed/p4VJ49GadUw" frameborder="0" gesture="media" allowfullscreen=""></iframe>
+https://www.youtube.com/watch?v=p4VJ49GadUw&feature=youtu.be
 
 ### dependencies
 ```java
