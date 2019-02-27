@@ -27,6 +27,9 @@ Android_AP-project with krinfra
 ## Video
 https://www.youtube.com/watch?v=p4VJ49GadUw&feature=youtu.be
 
+## Prototype
+https://ovenapp.io/view/OIazl72bbcnxhG2hWwtF0Yw7EArWx99u/
+
 ### dependencies
 ```java
 dependencies {
