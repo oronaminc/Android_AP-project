@@ -4,5 +4,6 @@ public class Point {
     String pointName;
     String pointX;
     String pointY;
-    String flag;
+    String memo_fromServer;
+    String memo_fromUser;
 }

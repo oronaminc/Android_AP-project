@@ -42,10 +42,12 @@
             android:textColor="#2d3436"
             android:textSize="40sp"
             android:textStyle="bold" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="invisible">
 
             <Button
                 android:id="@+id/button4"

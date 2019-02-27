@@ -115,7 +115,7 @@ public class CameraActivity extends AppCompatActivity{
     //지도에 이용할 점, 지도 정의
     MapFragment mapFragment;
     Double pointX, pointY;
-    String pointName;
+    String pointName, pointMemo;
     FieldResult field;
     GoogleMap map;
     Integer j;
@@ -130,6 +130,7 @@ public class CameraActivity extends AppCompatActivity{
     File dir = new File(sdcard);
     JSONObject obj;
     JSONParser jsonParser = new JSONParser();
+    String folder="";
 
 
     @Override
@@ -256,6 +257,8 @@ public class CameraActivity extends AppCompatActivity{
                 Intent intent = new Intent(getApplicationContext(), UploadMemoPicture.class);
                 intent.putExtra("fieldPath", fieldPath);
                 intent.putExtra("pointName", pointName);
+                intent.putExtra("pointMemo", pointMemo);
+                intent.putExtra("glob_ip", glob_ip);
                 startActivity(intent);
 
             }
@@ -325,6 +328,8 @@ public class CameraActivity extends AppCompatActivity{
         // 도형이 몇개 있는 지
         int fieldNum = field.fieldResult.size();
 
+        folder += String.valueOf(fieldNum);
+
         fieldArr = new PolygonOptions[fieldNum];
 
         for (int j = 0; j< fieldNum; j++){
@@ -332,10 +337,12 @@ public class CameraActivity extends AppCompatActivity{
             String fieldName = field.fieldName;
             fieldPath = field.fieldResult.get(j).fieldKey;
             int pointNum = field.fieldResult.get(j).numbersOfPoint;
+            folder += String.valueOf(pointNum);
 
             pointArr =new Point[pointNum];
             for(int i = 0; i<pointNum; i++) {
                 pointName = field.fieldResult.get(j).fieldArea.get(i).pointName;
+                pointMemo = field.fieldResult.get(j).fieldArea.get(i).memo_fromServer;
                 pointX = Double.parseDouble(field.fieldResult.get(j).fieldArea.get(i).pointX);
                 pointY = Double.parseDouble(field.fieldResult.get(j).fieldArea.get(i).pointY);
 
@@ -557,52 +564,6 @@ public class CameraActivity extends AppCompatActivity{
     }
 
 
-    /*
-    //소켓 통신에 대한 쓰레드 구축
-    class ClientThread extends Thread{
-        String hostname;
-        Integer hostport;
-        public ClientThread(String set_ip, String set_port){
-            hostname = set_ip;
-            hostport = Integer.valueOf(set_port);
-        }
-
-        public void run(){
-            try {
-                Socket socket = new Socket(hostname, hostport);
-
-                ObjectInputStream instream = new ObjectInputStream(socket.getInputStream());
-                //final 키워드를 붙여서 상수처럼 접근할 수 있도록 해줍니다.
-                final Object input = instream.readObject();
-                //final String jsonObject = (String) input;
-                JSONObject jsonObject = (JSONObject) input;
-                final String response = jsonObject.toJSONString().trim();
-
-                ObjectOutputStream outstream = new ObjectOutputStream(socket.getOutputStream());
-                outstream.writeObject("서버로 보냄");
-                outstream.flush();
-                Log.d("ClientThread", "서버로 보냄");
-
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        dataMining(response);
-                        Toast.makeText(getApplicationContext(),"제대로 실행되었습니다",Toast.LENGTH_SHORT).show();
-                        //textView.setText("받은 데이터 : " + name + email + age);
-                    }
-                });
-
-                socket.close();
-
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-        }
-
-
-    }
-    */
 
 
     class ConnectThread extends Thread {
@@ -612,15 +573,22 @@ public class CameraActivity extends AppCompatActivity{
         }
         public void run() {
             try {
-                JSONObject obj = (JSONObject) jsonParser.parse(new FileReader(sdcard+"/data.json"));
                 int port = 11001;
                 Socket sock = new Socket(hostname, port);
+                ObjectOutputStream outstream = new ObjectOutputStream(sock.getOutputStream());
+                outstream.writeObject(folder);
+                outstream.flush();
+                sock.close();
+                /*
+                JSONObject obj = (JSONObject) jsonParser.parse(new FileReader(sdcard+"/data.json"));
+
                 ObjectOutputStream outstream = new ObjectOutputStream(sock.getOutputStream());
                 //outstream.writeObject(input01.getText().toString().trim());
                 outstream.writeObject(obj);
                 outstream.flush();
                 Log.d("MainActivity", "서버로 보낼 메시지 : " + "서버로 잘 보냈습니다");
                 sock.close();
+                */
 
             } catch(Exception ex) {
                 ex.printStackTrace();
